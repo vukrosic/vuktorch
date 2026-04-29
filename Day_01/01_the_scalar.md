@@ -2,7 +2,7 @@
 
 **Series:** PyTorch from Scratch: The Zero-to-One Framework
 
-This is the full Day 01 lesson in one markdown file. Open this file, read it top to bottom, and record the video from it. The code examples are included inline, and the homework tasks and hints are at the end.
+This is the full Day 01 lesson in one markdown file. Open this file, read it top to bottom, and record the video from it. The lesson is broken into small steps, and each step has a short practice task so people can follow along without getting lost in huge code blocks.
 
 ## Goal
 
@@ -49,40 +49,80 @@ class Value:
         self._op = _op
         self.label = label
         self._backward = lambda: None
+```
 
+```python
     def __repr__(self):
         return f"Value(data={self.data}, grad={self.grad})"
 ```
 
-## Step 2: Add `+` and `*`
+### Try This Yourself
 
-Each operation creates a new node and stores a local backward rule on that output node.
+Create a `Value` instance and print it.
+
+### Hint
+
+Use a simple number like `Value(3.14)`.
+
+## Step 2: Add `+`
+
+The first operation is addition. It creates a new node and stores a backward rule on that output node.
 
 ```python
     def __add__(self, other):
         other = other if isinstance(other, Value) else Value(other)
         out = Value(self.data + other.data, (self, other), "+")
+```
 
+```python
         def _backward():
             self.grad += 1.0 * out.grad
             other.grad += 1.0 * out.grad
+```
 
-        out._backward = _backward
-        return out
-
-    def __mul__(self, other):
-        other = other if isinstance(other, Value) else Value(other)
-        out = Value(self.data * other.data, (self, other), "*")
-
-        def _backward():
-            self.grad += other.data * out.grad
-            other.grad += self.data * out.grad
-
+```python
         out._backward = _backward
         return out
 ```
 
-## Step 3: Build a Tiny Graph
+### Try This Yourself
+
+Ask the learner to implement addition from memory in a fresh file or notebook cell.
+
+### Hint
+
+Each side of addition receives the same gradient.
+
+## Step 3: Add `*`
+
+Multiplication is the second operation. It follows the same structure, but the local derivatives are different.
+
+```python
+    def __mul__(self, other):
+        other = other if isinstance(other, Value) else Value(other)
+        out = Value(self.data * other.data, (self, other), "*")
+```
+
+```python
+        def _backward():
+            self.grad += other.data * out.grad
+            other.grad += self.data * out.grad
+```
+
+```python
+        out._backward = _backward
+        return out
+```
+
+### Try This Yourself
+
+Ask the learner to write the local backward rule for multiplication without looking.
+
+### Hint
+
+Each parent gets the other parent’s value multiplied by the output gradient.
+
+## Step 4: Build a Tiny Graph
 
 We will use the same toy graph throughout Day 01:
 
@@ -98,18 +138,27 @@ Forward values:
 - `e = a * b = -6.0`
 - `d = e + c = 4.0`
 
-## Step 4: Inspect the Forward Pass
+### Create the values
 
 ```python
 a = Value(2.0, label="a")
 b = Value(-3.0, label="b")
 c = Value(10.0, label="c")
+```
 
+```python
 e = a * b
 e.label = "e"
+```
+
+```python
 d = e + c
 d.label = "d"
+```
 
+### Inspect the forward pass
+
+```python
 print("Forward pass:")
 print("a =", a.data)
 print("b =", b.data)
@@ -117,6 +166,14 @@ print("c =", c.data)
 print("e = a * b =", e.data)
 print("d = e + c =", d.data)
 ```
+
+### Try This Yourself
+
+Have the learner predict the outputs before running the code.
+
+### Hint
+
+Work left to right: first multiply, then add.
 
 ## Step 5: Backward Pass by Hand
 
@@ -128,9 +185,17 @@ For multiplication, the left input gets the right value and the right input gets
 
 ```python
 d.grad = 1.0
-d._backward()
-e._backward()
+```
 
+```python
+d._backward()
+```
+
+```python
+e._backward()
+```
+
+```python
 print("Gradients after manual backprop:")
 print("dd/da =", a.grad)
 print("dd/db =", b.grad)
@@ -146,6 +211,14 @@ Expected values:
 - `dd/dc = 1.0`
 - `dd/de = 1.0`
 - `dd/dd = 1.0`
+
+### Try This Yourself
+
+Ask the learner to explain why `a` gets `-3.0` and `b` gets `2.0`.
+
+### Hint
+
+`d` depends on `e`, and `e = a * b`, so the gradient through `e` gets multiplied by the other input.
 
 ## What To Say On Camera
 
@@ -200,6 +273,14 @@ Use this as the starting point in `vuktorch/engine.py`:
         return out
 ```
 
+### Try This Yourself
+
+Add `__pow__` to the engine, then test `x = Value(2.0); y = x ** 3`.
+
+### Hint
+
+The forward pass is `self.data ** other`, and the derivative is `other * self.data ** (other - 1)`.
+
 ### Example To Match
 
 When it is implemented, this should work:
@@ -221,7 +302,9 @@ Your implementation should pass these checks:
 ```python
 x = Value(2.0)
 assert (x ** 2).data == 4.0
+```
 
+```python
 x = Value(3.0)
 y = x ** 3
 y.grad = 1.0
