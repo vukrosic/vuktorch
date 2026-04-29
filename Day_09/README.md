@@ -20,3 +20,10 @@ This is where the framework becomes reusable on new datasets.
 ## Exercise
 
 Train on a tiny synthetic dataset and track the loss over time.
+
+## Files
+
+- `09_training_template.ipynb`
+- `examples/train_xor.py`
+- `vuktorch/train.py`
+- `vuktorch/optim.py`

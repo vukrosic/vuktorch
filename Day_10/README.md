@@ -20,3 +20,10 @@ This is the proof that the whole curriculum composes into a real framework.
 ## Exercise
 
 Run the final script on MNIST and inspect a few predictions.
+
+## Files
+
+- `10_mnist_template.ipynb`
+- `examples/train_mnist.py`
+- `vuktorch/datasets.py`
+- `vuktorch/train_mnist.py`

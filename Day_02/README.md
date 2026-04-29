@@ -23,3 +23,9 @@ derivative bookkeeping.
 
 Add a small demo script that builds `d = a * b + c`, runs `.backward()`, and
 prints the gradients.
+
+## Files
+
+- `02_autograd_template.ipynb`
+- `examples/autograd_demo.py`
+- `vuktorch/engine.py`

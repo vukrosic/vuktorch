@@ -19,3 +19,10 @@ Backpropagation gives direction. Optimization turns direction into learning.
 ## Exercise
 
 Run one gradient descent step on a tiny example and confirm the loss decreases.
+
+## Files
+
+- `08_sgd_template.ipynb`
+- `vuktorch/optim.py`
+- `vuktorch/losses.py`
+- `vuktorch/nn.py`

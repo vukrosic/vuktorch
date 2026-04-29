@@ -21,3 +21,9 @@ target.
 ## Exercise
 
 Compare MSE and cross-entropy on the same toy predictions.
+
+## Files
+
+- `07_losses_template.ipynb`
+- `vuktorch/losses.py`
+- `vuktorch/nn.py`
