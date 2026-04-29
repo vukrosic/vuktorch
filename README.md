@@ -21,7 +21,7 @@ readability-first approach.
 
 ## Structure
 
-- Every day has a notebook template for recording.
+- Every day has a markdown lesson file for recording.
 - Every day that introduces new framework code has a `vuktorch/` snapshot for
   that lesson.
 - Days with concrete demos also include small example scripts.
