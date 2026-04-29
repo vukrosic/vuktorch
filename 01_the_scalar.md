@@ -2,37 +2,42 @@
 
 **Series:** PyTorch from Scratch: The Zero-to-One Framework
 
-This is the full Day 01 recording script in one file. Open this markdown file, read it top to bottom, and record from it directly.
-
 ## Goal
 
-Build the smallest useful object in the whole framework: a scalar `Value` that stores a number, remembers where it came from, and knows how gradients should flow backward.
+Build a scalar `Value` object that stores a number, remembers which values created it, and knows how to send gradients backward.
 
-## Why This Exists
+## What You Should Understand By The End
 
-A plain Python float can hold a number like `3.0`, but it cannot answer:
+- why a plain float is not enough for autograd
+- what information each scalar node must store
+- how `+` and `*` create graph nodes
+- how local backward rules produce gradients
 
-- where did this number come from?
-- what operation created it?
-- which earlier values should receive gradient from it?
+## Why A Scalar Class Exists
 
-That is the gap the `Value` class fills. Day 01 is not about speed or abstraction. It is about making autograd feel inevitable.
+A Python float can hold `3.0`, but it cannot answer:
 
-## What The Scalar Needs To Store
+- where did this value come from?
+- which earlier values produced it?
+- what gradients should flow into those earlier values?
 
-Our scalar node needs five things:
+That is what the `Value` class adds.
 
-- `data` for the actual number
-- `grad` for the gradient accumulated at that node
+## What A Node Stores
+
+Each scalar node needs:
+
+- `data` for the number
+- `grad` for the gradient at that node
 - `_prev` for the parent nodes
-- `_op` for the operation that produced the node
+- `_op` for the operation that created the node
 - `_backward` for the local chain-rule step
 
-If those five things exist, then the rest of autograd is mostly graph traversal.
+If those pieces exist, then autograd becomes a graph traversal problem.
 
-## Step 1: Start With The Constructor
+## Step 1: Create The Node
 
-Start with the minimum state. At this point the class does not know how to add or multiply yet. It only knows how to represent one node.
+Start with the smallest useful version of the class.
 
 ```python
 class Value:
@@ -45,35 +50,22 @@ class Value:
         self._backward = lambda: None
 ```
 
-The important line here is `self._prev = set(_children)`. That is what turns a plain number into a graph node. Every result can now remember which earlier values created it.
+`self._prev` is what makes this a graph node instead of just a wrapper around a float. `self.grad` starts at `0.0` and will be filled during backpropagation.
 
-Also notice `self.grad = 0.0`. Gradients will accumulate into that field later when we manually backpropagate.
-
-## Step 2: Make The Object Printable
-
-Once you start creating nodes, you need a fast way to inspect them.
+## Step 2: Make It Easy To Inspect
 
 ```python
     def __repr__(self):
         return f"Value(data={self.data}, grad={self.grad})"
 ```
 
-This is small, but it matters for teaching. If the object prints clearly, the learner can see both the forward value and the gradient state at every step.
+This makes the object readable while debugging.
 
-### Quick Check
-
-Ask the learner to run this:
-
-```python
-x = Value(3.14)
-print(x)
-```
-
-Expected idea: the number shows up in `data`, and `grad` is still `0.0` because no backward pass has happened yet.
+Question: what should `print(Value(3.14))` show before any backward pass runs?
 
 ## Step 3: Add Addition
 
-Now we create the first real operation: `+`.
+Addition creates a new output node.
 
 ```python
     def __add__(self, other):
@@ -81,13 +73,9 @@ Now we create the first real operation: `+`.
         out = Value(self.data + other.data, (self, other), "+")
 ```
 
-The first line normalizes inputs so `Value(2.0) + 3.0` still works. The second line creates a brand new node called `out`. That new node stores:
+The result stores the new value, both parents, and the operation symbol.
 
-- the new scalar value
-- both parents
-- the symbol `"+"` so we know how it was created
-
-At this point the graph structure already exists. We still need the local derivative rule.
+Now attach the local backward rule.
 
 ```python
         def _backward():
@@ -95,26 +83,20 @@ At this point the graph structure already exists. We still need the local deriva
             other.grad += 1.0 * out.grad
 ```
 
-This closure is the whole Day 01 idea in miniature. The output node knows how to send gradient into its parents. For addition, both sides receive `1 * out.grad`.
+For addition, both parents receive the same gradient.
 
 ```python
         out._backward = _backward
         return out
 ```
 
-The local rule is attached to the result node itself. That means every result carries its own tiny backward instruction.
+Question: why do both parents receive `1 * out.grad`?
 
-### Quick Check
-
-Ask the learner to explain this sentence in plain English: "the output of `x + y` sends the same gradient to both parents."
-
-### Hint
-
-The derivative of `x + y` with respect to `x` is `1`, and with respect to `y` is also `1`.
+Hint: `d(x + y)/dx = 1` and `d(x + y)/dy = 1`.
 
 ## Step 4: Add Multiplication
 
-Multiplication uses the same pattern. The structure stays the same. Only the local derivative rule changes.
+Multiplication uses the same structure, but a different derivative rule.
 
 ```python
     def __mul__(self, other):
@@ -122,7 +104,7 @@ Multiplication uses the same pattern. The structure stays the same. Only the loc
         out = Value(self.data * other.data, (self, other), "*")
 ```
 
-Again, a new output node is created. It stores the product, the parents, and the operation symbol.
+The node creation logic is unchanged. Only the local derivative rule changes.
 
 ```python
         def _backward():
@@ -130,26 +112,18 @@ Again, a new output node is created. It stores the product, the parents, and the
             other.grad += self.data * out.grad
 ```
 
-This is the product rule in local form. The left parent receives the right parent's value times the output gradient. The right parent receives the left parent's value times the output gradient.
+Each parent receives the other parent's value multiplied by the output gradient.
 
 ```python
         out._backward = _backward
         return out
 ```
 
-Same pattern as addition. New node, local backward rule, return the result.
+Question: if `e = a * b`, what are `de/da` and `de/db`?
 
-### Quick Check
+Hint: `de/da = b` and `de/db = a`.
 
-Ask the learner what gradient should flow into `a` and `b` if `e = a * b`.
-
-### Hint
-
-`de/da = b` and `de/db = a`.
-
-## Step 5: Put The Whole Day 01 Class Together
-
-At this point the full Day 01 class is still very small.
+## Full Day 01 Class
 
 ```python
 class Value:
@@ -187,11 +161,11 @@ class Value:
         return out
 ```
 
-That is enough to build a graph and manually push gradients through it.
+That is enough for a tiny computation graph.
 
-## Step 6: Build A Tiny Graph
+## Step 5: Build A Tiny Graph
 
-We will use one simple graph for the whole lesson:
+Use this graph for the whole lesson:
 
 ```text
 a = 2.0
@@ -201,41 +175,25 @@ e = a * b
 d = e + c
 ```
 
-This is small enough to compute by hand, which is exactly what we want.
+Create the nodes:
 
 ```python
 a = Value(2.0, label="a")
 b = Value(-3.0, label="b")
 c = Value(10.0, label="c")
-```
 
-These are the leaf nodes. They were not created by any earlier operation.
-
-```python
 e = a * b
 e.label = "e"
-```
 
-This creates the first intermediate node. `e` now remembers that it came from `a` and `b` through multiplication.
-
-```python
 d = e + c
 d.label = "d"
 ```
 
-This creates the final output. `d` remembers that it came from `e` and `c` through addition.
-
-## Step 7: Inspect The Forward Pass
-
-Before talking about gradients, make the forward numbers concrete.
+Forward pass:
 
 ```python
-print("Forward pass:")
-print("a =", a.data)
-print("b =", b.data)
-print("c =", c.data)
-print("e = a * b =", e.data)
-print("d = e + c =", d.data)
+print("e =", e.data)
+print("d =", d.data)
 ```
 
 Expected values:
@@ -243,48 +201,28 @@ Expected values:
 - `e = -6.0`
 - `d = 4.0`
 
-### Quick Check
+Question: what happens if you multiply first and then add?
 
-Ask the learner to predict `e` and `d` before running the code.
+## Step 6: Run Backward By Hand
 
-### Hint
+Day 01 does not automate graph traversal yet. The backward rules already exist, so call them manually in reverse order.
 
-Multiply first, then add.
-
-## Step 8: Seed The Output Gradient
-
-Backward propagation always starts by saying "the output changes with respect to itself by 1."
+Start by seeding the output gradient:
 
 ```python
 d.grad = 1.0
 ```
 
-This is the seed of the whole backward pass. Without this line, no gradient has anywhere to start from.
-
-## Step 9: Run The Local Backward Rules Manually
-
-Day 01 does not implement automatic graph traversal yet. We call the local rules ourselves in reverse order.
+Then run the local backward rules:
 
 ```python
 d._backward()
-```
-
-This pushes gradient from `d` into `e` and `c`.
-
-```python
 e._backward()
 ```
 
-This pushes the gradient that reached `e` back into `a` and `b`.
-
-That is manual backpropagation. The rules were always there. We just executed them ourselves.
-
-## Step 10: Inspect The Gradients
-
-Now print the gradient values and explain what each one means.
+Print the gradients:
 
 ```python
-print("Gradients after manual backprop:")
 print("dd/da =", a.grad)
 print("dd/db =", b.grad)
 print("dd/dc =", c.grad)
@@ -300,49 +238,27 @@ Expected values:
 - `dd/de = 1.0`
 - `dd/dd = 1.0`
 
-Why these numbers:
+Why these values:
 
 - `dd/dc = 1` because `d = e + c`
 - `dd/de = 1` because `d = e + c`
 - `dd/da = b = -3` because `e = a * b`
 - `dd/db = a = 2` because `e = a * b`
 
-### Quick Check
-
-Ask the learner why `a.grad` becomes negative while `b.grad` becomes positive.
-
-### Hint
-
-The sign comes from the other multiplicand.
-
-## What The Learner Should Understand Before Moving On
-
-If the learner understands these three sentences, Day 01 worked:
-
-- every result node stores its parents
-- every result node stores a local backward rule
-- backpropagation is just the repeated application of those local rules in reverse order
-
-Day 02 will automate the reverse traversal, but it will not change the local derivative logic from today.
+Question: why is `a.grad` negative while `b.grad` is positive?
 
 ## Homework
 
-The homework should be short, directly tied to the lesson, and testable with plain Python. The first version needed one fix: it should not rely on `.backward()` yet, because Day 01 has not implemented automatic traversal. The homework below stays consistent with the lesson.
+These tasks stay close to the lesson and can be tested with plain Python.
 
 ### Homework 1: Add `__pow__`
 
 Implement `x ** n` for a scalar `Value`, where `n` is a Python number.
 
-What to implement:
+Rules:
 
-- forward rule: `x ** n`
-- backward rule: `n * x ** (n - 1)`
-
-Constraints:
-
-- only support numeric exponents
-- keep the style consistent with `__add__` and `__mul__`
-- accumulate gradients with `+=`
+- forward: `x ** n`
+- backward: `n * x ** (n - 1)`
 
 Starter shape:
 
@@ -358,13 +274,7 @@ Starter shape:
         return out
 ```
 
-Why this is good homework:
-
-- it reuses the same pattern from `+` and `*`
-- it forces the learner to separate forward logic from backward logic
-- it stays scalar-only, so the difficulty does not jump too early
-
-Test it like this:
+Test:
 
 ```python
 x = Value(2.0)
@@ -376,22 +286,18 @@ assert y.data == 8.0
 assert x.grad == 12.0
 ```
 
+This is good Day 1 homework because it reuses the same pattern as `+` and `*`.
+
 ### Homework 2: Support Right-Hand Numbers
 
-Make expressions like `2 + Value(3.0)` and `2 * Value(3.0)` work.
+Make these work:
 
-Why this is good homework:
+```python
+2 + Value(3.0)
+2 * Value(3.0)
+```
 
-- it is small
-- it improves ergonomics immediately
-- it teaches that Python dispatch has left-hand and right-hand variants
-
-Hint:
-
-- implement `__radd__`
-- implement `__rmul__`
-
-Expected shape:
+Implementation shape:
 
 ```python
     def __radd__(self, other):
@@ -401,7 +307,7 @@ Expected shape:
         return self * other
 ```
 
-Quick test:
+Test:
 
 ```python
 x = Value(3.0)
@@ -409,7 +315,7 @@ assert (2 + x).data == 5.0
 assert (2 * x).data == 6.0
 ```
 
-### Stretch Homework: Add Division
+### Stretch: Add Division
 
 Only do this after `__pow__` works.
 
@@ -419,8 +325,6 @@ Only do this after `__pow__` works.
         return self * (other ** -1)
 ```
 
-This is a good stretch task because it teaches code reuse. Division does not need new math if power already exists.
-
 ## End Of Day 01
 
-Day 01 is done when the learner can read a tiny graph, explain where each gradient comes from, and implement one new scalar operation by following the same local-rule pattern.
+Day 01 is complete once you can explain where each gradient comes from and implement one new scalar operation using the same local-rule pattern.
