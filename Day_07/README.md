@@ -1,6 +1,6 @@
 # Day 07 - Loss Functions
 
-Day 07 turns model outputs into a training signal.
+Day 07 turns model outputs into training signals.
 
 ## Goal
 
@@ -11,12 +11,12 @@ cross-entropy.
 
 - mean squared error
 - cross-entropy
-- loss aggregation across a batch
+- batch aggregation
 
 ## Why It Matters
 
-Without a loss, the model has no direction. This day makes the framework
-optimizable.
+Without a loss, gradients have no direction. This lesson gives learning a
+target.
 
 ## Exercise
 

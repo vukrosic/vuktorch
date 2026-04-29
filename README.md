@@ -32,6 +32,10 @@ The full teaching strategy and critique of the curriculum live in
 - `Day_01/HOMEWORK.md` - Day 01 challenge prompt for `__pow__`
 - `Day_02/vuktorch/engine.py` - scalar autograd engine with `.backward()`
 - `Day_02/examples/autograd_demo.py` - automatic backprop demo
+- `Day_03/03_tensors_template.ipynb` through `Day_10/10_mnist_template.ipynb`
+  - lesson notebooks for the remaining days
+- `Day_03/vuktorch/tensor.py` - first vectorized tensor engine
+- `Day_04/vuktorch/tensor.py` - tensor ops with broadcasting and matmul
 
 Each day folder now has a README that states the goal, build target, and
 exercise so the course is coherent from end to end.

@@ -10,15 +10,13 @@ together with a final script.
 ## Build
 
 - data loading for MNIST
-- final training script
+- a final training script
 - end-to-end evaluation
 
 ## Why It Matters
 
-This is the proof that the whole curriculum composes into a real framework, not
-just isolated demos.
+This is the proof that the whole curriculum composes into a real framework.
 
 ## Exercise
 
-Run the final script on MNIST and inspect the model's predictions on a few
-samples.
+Run the final script on MNIST and inspect a few predictions.

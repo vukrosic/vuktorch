@@ -1,23 +1,29 @@
 # Day 04 - Tensor Ops
 
-Day 04 is where tensor math becomes useful for neural networks.
+Day 04 upgrades the tensor engine with the operations neural networks actually
+need.
 
 ## Goal
 
-Add broadcasting rules, matrix multiplication, and the first useful tensor
-compositions.
+Add broadcasting rules, matrix multiplication, and a few more tensor utilities.
 
 ## Build
 
-- broadcasting semantics
-- matrix multiply
-- reductions that prepare for loss functions
+- broadcasting-aware elementwise ops
+- matrix multiplication
+- ReLU and reduction helpers
 
 ## Why It Matters
 
-This is the day where the framework stops being “a tensor container” and starts
-becoming “something that can express neural network math.”
+This is the point where the framework becomes expressive enough for linear
+layers and batched data.
 
 ## Exercise
 
-Implement matrix multiply for a small batch and compare it to NumPy.
+Multiply a batch matrix by a weight matrix and confirm the output shape and
+gradient flow.
+
+## Files
+
+- `04_tensor_ops_template.ipynb`
+- `vuktorch/tensor.py`

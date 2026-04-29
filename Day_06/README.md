@@ -1,6 +1,6 @@
 # Day 06 - Layers and MLPs
 
-Day 06 composes the small pieces into a real model.
+Day 06 composes neurons into networks.
 
 ## Goal
 
@@ -10,12 +10,11 @@ Compose neurons into layers, then layers into a small multilayer perceptron.
 
 - `Layer`
 - `MLP`
-- model composition from reusable modules
+- composition over reusable modules
 
 ## Why It Matters
 
-This is the first day where the framework starts to look like a miniature
-PyTorch-style model stack.
+This is the first day the framework looks like a miniature model library.
 
 ## Exercise
 

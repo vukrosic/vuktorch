@@ -1,24 +1,23 @@
 # Day 05 - Modules and Neurons
 
-Day 05 introduces the object model for networks.
+Day 05 introduces reusable model components.
 
 ## Goal
 
-Introduce reusable model components with a `Module` base class and a scalar
-neuron abstraction.
+Introduce a `Module` base class and a scalar neuron abstraction.
 
 ## Build
 
 - `Module`
 - `Neuron`
 - parameter discovery
-- simple scalar activation functions
+- a small activation wrapper
 
 ## Why It Matters
 
-Once tensors exist, the next problem is organization. This day gives the user a
-clean mental model for reusable model pieces.
+Once tensors work, the next job is organizing parameters and computation into
+reusable pieces.
 
 ## Exercise
 
-Build a neuron with a few scalar inputs and print its parameters.
+Build a neuron with a few scalar inputs and inspect its parameters.

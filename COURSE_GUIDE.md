@@ -62,5 +62,5 @@ That means every day should have the same internal structure:
 - Day 01 is now a complete teaching packet.
 - Day 02 has the autograd engine, but should still get a dedicated demo and
   lesson framing.
-- Days 03-10 need concrete build targets, example scripts, and eventually the
-  actual source files for the framework layers.
+- Days 03 and 04 now have source modules and notebook templates.
+- Days 05-10 now have notebook templates and lesson briefs.

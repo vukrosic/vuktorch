@@ -1,6 +1,6 @@
 # Day 09 - Training Loops
 
-Day 09 assembles everything into a proper training script.
+Day 09 assembles the pieces into a training script.
 
 ## Goal
 
@@ -15,9 +15,8 @@ and parameter updates.
 
 ## Why It Matters
 
-This is where the framework becomes repeatable. The viewer should leave with a
-template they can reuse on new datasets.
+This is where the framework becomes reusable on new datasets.
 
 ## Exercise
 
-Train on a tiny synthetic dataset and plot or print progress over time.
+Train on a tiny synthetic dataset and track the loss over time.

@@ -10,12 +10,11 @@ Add an `SGD` optimizer and show how parameter updates close the training loop.
 
 - `SGD`
 - `zero_grad`
-- parameter update step
+- a parameter update step
 
 ## Why It Matters
 
-Backpropagation gives direction. Optimization turns that direction into learning
-by nudging parameters after each backward pass.
+Backpropagation gives direction. Optimization turns direction into learning.
 
 ## Exercise
 
