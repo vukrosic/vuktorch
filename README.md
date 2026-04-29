@@ -8,7 +8,7 @@ readability-first approach.
 
 ## Curriculum
 
-- `Day_01` - The Scalar
+- `01_the_scalar.md` - The Scalar
 - `Day_02` - Autograd
 - `Day_03` - Tensors
 - `Day_04` - Tensor Ops
@@ -21,10 +21,8 @@ readability-first approach.
 
 ## Structure
 
-- Every day has a markdown lesson file for recording.
-- Every day that introduces new framework code has a `vuktorch/` snapshot for
-  that lesson.
-- Days with concrete demos also include small example scripts.
+- Lesson files can live at the repo root for direct recording access.
+- Supporting code snapshots and example scripts can stay in lesson-specific folders when needed.
 
 The course is intentionally incremental: each day adds only the code needed for
 that lesson and leaves out repo meta-planning that does not belong in the
