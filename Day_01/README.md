@@ -35,9 +35,8 @@ The `Value` class fixes that by storing:
 
 ## Files
 
-- `01_the_scalar_template.ipynb` - teaching notebook with blank code cells for
-  recording
-- `HOMEWORK.md` - Day 01 challenge for implementing `__pow__`
+- `01_the_scalar.ipynb` - finished lesson notebook
+- `HOMEWORK.ipynb` - homework notebook with prompts, hints, and starter stubs
 - `examples/manual_backprop.py` - a tiny worked example showing gradients by
   hand
 - `vuktorch/engine.py` - the Day 01 scalar engine
