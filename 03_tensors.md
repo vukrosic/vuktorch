@@ -2,6 +2,8 @@
 
 **Series:** PyTorch from Scratch: The Zero-to-One Framework
 
+**Community:** [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about)
+
 ## Goal
 
 Move from scalar values to NumPy-backed tensors while keeping the same autograd ideas.
@@ -201,3 +203,5 @@ Reuse `__pow__` to support division.
 ## End Of Day 03
 
 Day 03 is complete once arrays feel like a direct extension of the scalar engine instead of a brand new system.
+
+Continue with the community here: [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about).

@@ -2,6 +2,8 @@
 
 **Series:** PyTorch from Scratch: The Zero-to-One Framework
 
+**Community:** [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about)
+
 ## Goal
 
 Assemble the model, loss, optimizer, and data into a reusable training loop.
@@ -109,3 +111,5 @@ Think about a rule that would stop training if validation loss stopped improving
 ## End Of Day 09
 
 Day 09 is complete once the framework can run the same training recipe repeatedly instead of only one hand-written update step at a time.
+
+Continue with the community here: [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about).

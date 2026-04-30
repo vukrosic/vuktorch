@@ -2,6 +2,8 @@
 
 **Series:** PyTorch from Scratch: The Zero-to-One Framework
 
+**Community:** [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about)
+
 ## Goal
 
 Add the tensor operations real models need: broadcasting, matrix multiplication, and a few utility ops.
@@ -144,3 +146,5 @@ If the 2D case is stable, think about what would need to change for higher-rank 
 ## End Of Day 04
 
 Day 04 is complete once tensor shapes stop feeling incidental and start feeling like part of the autograd design.
+
+Continue with the community here: [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about).

@@ -2,6 +2,8 @@
 
 **Series:** PyTorch from Scratch: The Zero-to-One Framework
 
+**Community:** [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about)
+
 ## Goal
 
 Introduce a `Module` base class and build a single neuron on top of the tensor engine.
@@ -128,3 +130,5 @@ Think ahead: if a layer contains many neurons, how should `parameters()` combine
 ## End Of Day 05
 
 Day 05 is complete once a learned component feels like both a function and a container of trainable state.
+
+Continue with the community here: [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about).

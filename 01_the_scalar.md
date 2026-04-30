@@ -2,6 +2,9 @@
 
 **Series:** PyTorch from Scratch: The Zero-to-One Framework
 
+**Video:** [Day 01 lesson](https://youtu.be/iPVHKTqfzo4)  
+**Community:** [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about)
+
 ## Goal
 
 Build a scalar `Value` object that stores a number, remembers which values created it, and knows how to send gradients backward.
@@ -328,3 +331,5 @@ Only do this after `__pow__` works.
 ## End Of Day 01
 
 Day 01 is complete once you can explain where each gradient comes from and implement one new scalar operation using the same local-rule pattern.
+
+Continue with the community here: [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about).

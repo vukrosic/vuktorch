@@ -2,6 +2,8 @@
 
 **Series:** PyTorch from Scratch: The Zero-to-One Framework
 
+**Community:** [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about)
+
 ## Goal
 
 Turn manual backpropagation into a real `.backward()` method on `Value`.
@@ -196,3 +198,5 @@ Run backward twice on the same graph and observe what happens. Then add a helper
 ## End Of Day 02
 
 Day 02 is complete once `.backward()` produces the same gradients that Day 01 required you to compute by hand.
+
+Continue with the community here: [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about).

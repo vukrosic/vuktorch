@@ -2,6 +2,8 @@
 
 **Series:** PyTorch from Scratch: The Zero-to-One Framework
 
+**Community:** [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about)
+
 ## Goal
 
 Turn gradients into parameter updates by building a simple SGD optimizer.
@@ -107,3 +109,5 @@ Think about what extra state the optimizer would need if each step should rememb
 ## End Of Day 08
 
 Day 08 is complete once gradients stop being diagnostic information and start becoming actual learning updates.
+
+Continue with the community here: [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about).

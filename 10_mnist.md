@@ -2,6 +2,8 @@
 
 **Series:** PyTorch from Scratch: The Zero-to-One Framework
 
+**Community:** [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about)
+
 ## Goal
 
 Run the framework end to end on MNIST and prove that the full stack composes.
@@ -115,3 +117,5 @@ Try a simple input normalization step and compare whether training becomes smoot
 ## End Of Day 10
 
 Day 10 is complete once the framework can train on a real dataset and produce outputs that make the whole series feel coherent.
+
+Continue with the community here: [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about).

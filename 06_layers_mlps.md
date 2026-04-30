@@ -2,6 +2,8 @@
 
 **Series:** PyTorch from Scratch: The Zero-to-One Framework
 
+**Community:** [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about)
+
 ## Goal
 
 Compose neurons into layers and layers into a small multilayer perceptron.
@@ -119,3 +121,5 @@ Most MLPs do not want ReLU on the final output. Adjust the design so hidden laye
 ## End Of Day 06
 
 Day 06 is complete once a deeper model feels like simple composition rather than a new kind of abstraction.
+
+Continue with the community here: [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about).

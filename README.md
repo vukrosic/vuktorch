@@ -6,6 +6,8 @@ This repository is structured as a 10-part masterclass for building a small
 deep learning framework from first principles in a Karpathy-style,
 readability-first approach.
 
+Community: [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about)
+
 ## Curriculum
 
 - `01_the_scalar.md` - The Scalar
@@ -26,3 +28,5 @@ readability-first approach.
 The course is intentionally incremental: each day adds only the code needed for
 that lesson and leaves out repo meta-planning that does not belong in the
 teaching material.
+
+Continue with the community here: [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about).

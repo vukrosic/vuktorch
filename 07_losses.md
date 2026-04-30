@@ -2,6 +2,8 @@
 
 **Series:** PyTorch from Scratch: The Zero-to-One Framework
 
+**Community:** [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about)
+
 ## Goal
 
 Turn model outputs into a scalar training signal by implementing loss functions.
@@ -116,3 +118,5 @@ Look into why large logits can make naive softmax or log-softmax implementations
 ## End Of Day 07
 
 Day 07 is complete once model outputs can be turned into one scalar number that clearly says how wrong the model is.
+
+Continue with the community here: [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about).
