@@ -85,6 +85,20 @@ Good answers:
 - learning rate might be too high
 - gradients or backward rules might be wrong
 
+## Where This Lives In Code
+
+The final project implementation for this lesson lives in `vuktorch/optim.py`.
+
+Look for:
+
+- `SGD.__init__` for storing parameters and a learning rate
+- `SGD.zero_grad` for clearing parameter gradients between steps
+- `SGD.step` for the basic gradient descent update
+- `Adam` for a more portfolio-worthy optimizer that tracks moving averages of gradients and squared gradients
+
+The training behavior is tested in `tests/test_nn.py`, where a small model must
+reduce mean squared error after repeated optimizer steps.
+
 ## Homework
 
 ### Homework 1: One-Step Loss Check

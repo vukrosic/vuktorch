@@ -1,4 +1,4 @@
-# Day 06: Layers and MLPs
+# Day 06: Sequential Models and MLPs
 
 **Series:** PyTorch from Scratch: The Zero-to-One Framework
 
@@ -6,120 +6,170 @@
 
 ## Goal
 
-Compose neurons into layers and layers into a small multilayer perceptron.
+Compose `Linear` layers and activation modules into a small multilayer
+perceptron.
 
 ## What You Should Understand By The End
 
-- how a layer groups neurons
-- how an MLP stacks layers
-- why composition matters more than inventing new math here
-- how parameter collection scales from one module to many
+- how modules compose into larger modules
+- why activations are modules too
+- how `Sequential` makes model definitions readable
+- how an `MLP` turns architecture sizes into layers
 
 ## Why Day 06 Exists
 
-A single neuron is useful for understanding, but not for real modeling. The next step is to combine many neurons into reusable blocks.
+One linear layer is useful, but most interesting models stack several
+transformations:
 
-Day 06 is mostly about composition. The math engine and neuron logic already exist.
-
-## Step 1: Build A Layer
-
-A layer is just a list of neurons with the same input size.
-
-```python
-class Layer(Module):
-    def __init__(self, nin, nout):
-        self.neurons = [Neuron(nin) for _ in range(nout)]
+```text
+input -> linear -> activation -> linear -> activation -> linear -> output
 ```
 
-Each neuron receives the same input vector, but produces its own scalar output.
+The math does not change. The design challenge is making the composition clean.
 
-## Step 2: Write The Layer Forward Pass
+## Step 1: Add Activation Modules
+
+Activation functions already exist on `Tensor`, but model code is cleaner when
+they can also be used as layers.
 
 ```python
-def __call__(self, x):
-    outs = [n(x) for n in self.neurons]
-    return outs[0] if len(outs) == 1 else outs
+class ReLU(Module):
+    def forward(self, x):
+        return x.relu()
+
+class Tanh(Module):
+    def forward(self, x):
+        return x.tanh()
 ```
 
-This keeps the API convenient:
+These modules do not own parameters. They still fit the same interface because
+they transform tensors during the forward pass.
 
-- one output neuron returns one scalar-like result
-- multiple output neurons return a list of results
+Question: why is it useful for parameter-free layers and parameterized layers to
+share the same module interface?
 
-Question: why might returning a bare single value be nicer than returning a one-element list?
+## Step 2: Build Sequential
 
-## Step 3: Expose Layer Parameters
+`Sequential` stores layers in order and calls them one after another.
 
 ```python
-def parameters(self):
-    return [p for n in self.neurons for p in n.parameters()]
+class Sequential(Module):
+    def __init__(self, *layers):
+        self.layers = list(layers)
+
+    def forward(self, x):
+        for layer in self.layers:
+            x = layer(x)
+        return x
 ```
 
-This is the first nested parameter collection step.
+This is simple, but powerful. The list can contain any module: `Linear`, `ReLU`,
+`Tanh`, or another custom module.
 
-## Step 4: Build The MLP
+## Step 3: Define An MLP
 
-An MLP is just a stack of layers.
+An MLP is a sequence of linear layers with activations between hidden layers.
 
 ```python
-class MLP(Module):
-    def __init__(self, nin, nouts):
-        sz = [nin] + nouts
-        self.layers = [Layer(sz[i], sz[i + 1]) for i in range(len(nouts))]
+class MLP(Sequential):
+    def __init__(self, in_features, hidden, out_features, activation="tanh"):
+        ...
 ```
 
-If `nin = 3` and `nouts = [4, 4, 1]`, then the model structure is:
-
-- layer 1: `3 -> 4`
-- layer 2: `4 -> 4`
-- layer 3: `4 -> 1`
-
-## Step 5: Write The MLP Forward Pass
+For example:
 
 ```python
-def __call__(self, x):
-    for layer in self.layers:
-        x = layer(x)
-    return x
+model = MLP(2, [8, 8], 2)
 ```
 
-That is the whole composition story. Each layer transforms the representation and passes it to the next one.
+This means:
 
-## Step 6: Test A Tiny Model
+- input size: `2`
+- hidden layer 1: `2 -> 8`
+- hidden layer 2: `8 -> 8`
+- output layer: `8 -> 2`
+
+The final layer does not need an activation because classification logits should
+stay as raw scores before cross-entropy.
+
+## Step 4: Choose The Activation
+
+The final implementation supports `"tanh"` and `"relu"`:
 
 ```python
-model = MLP(3, [4, 4, 1])
-x = [Tensor(2.0), Tensor(3.0), Tensor(-1.0)]
-y = model(x)
+activation_cls = Tanh if activation == "tanh" else ReLU
+```
+
+That keeps the interface small while still letting you compare two common
+nonlinearities.
+
+Question: what would happen if every layer were linear and there were no
+activation functions?
+
+## Step 5: Test A Tiny Model
+
+```python
+x = Tensor([[0.5, -1.0]])
+model = MLP(2, [4, 4], 2)
+logits = model(x)
 ```
 
 Now inspect:
 
 ```python
-print(y)
+print(logits.shape)
 print(len(model.parameters()))
 ```
 
-Question: where do all of the parameters in an MLP actually live?
+Expected ideas:
+
+- `logits.shape` should be `(1, 2)`
+- parameters come from the nested `Linear` layers
+- activation modules do not add parameters
+
+## Where This Lives In Code
+
+The final project implementation for this lesson lives in `vuktorch/nn.py`.
+
+Look for:
+
+- `ReLU` and `Tanh` for activation modules
+- `Sequential` for ordered composition
+- `MLP` for turning an architecture specification into a complete model
+- `Module.parameters` for recursively collecting parameters from nested layers
+
+The model is used directly in `examples/mlp_moons.py`, where `MLP(2, [8, 8], 2)`
+trains as a classifier. It is also used in `tests/test_nn.py` to prove that the
+module stack can learn.
 
 ## Homework
 
-### Homework 1: Add Layer `__repr__`
+### Homework 1: Change The Width
 
-Make a layer print how many neurons it contains.
+Try:
 
-### Homework 2: Add MLP `__repr__`
+```python
+MLP(2, [4], 2)
+MLP(2, [16, 16], 2)
+```
 
-Print the full architecture in a compact way, such as the input size and output sizes.
+Compare parameter counts and training behavior.
 
-These are good exercises because model inspection becomes important fast once the object graph grows.
+### Homework 2: Add `__repr__`
 
-### Stretch: Final-Layer Nonlinearity
+Make `Sequential` or `MLP` print a compact architecture summary.
 
-Most MLPs do not want ReLU on the final output. Adjust the design so hidden layers can be nonlinear while the final layer can stay linear.
+This is useful because portfolio reviewers should be able to understand the
+model at a glance.
+
+### Stretch: Validate Activation Names
+
+Raise a clear error if someone passes an activation name other than `"tanh"` or
+`"relu"`.
 
 ## End Of Day 06
 
-Day 06 is complete once a deeper model feels like simple composition rather than a new kind of abstraction.
+Day 06 is complete once a deeper model feels like a clean composition of reusable
+modules.
 
 Continue with the community here: [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about).

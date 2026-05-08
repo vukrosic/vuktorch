@@ -1,4 +1,4 @@
-# Day 05: Modules and Neurons
+# Day 05: Modules and Linear Layers
 
 **Series:** PyTorch from Scratch: The Zero-to-One Framework
 
@@ -6,129 +6,190 @@
 
 ## Goal
 
-Introduce a `Module` base class and build a single neuron on top of the tensor engine.
+Move from raw tensor operations to reusable model components by implementing
+`Parameter`, `Module`, and `Linear`.
 
 ## What You Should Understand By The End
 
-- why models need structure beyond raw tensor ops
+- why learned weights should be represented as parameters
 - what a `Module` should expose
-- how parameters are collected
-- how a neuron combines weights, inputs, bias, and nonlinearity
+- how parameters are collected from nested objects
+- how a vectorized linear layer replaces hand-written neurons
 
 ## Why Day 05 Exists
 
-By Day 04, the math engine is strong enough to express a neuron. The next problem is organization. You need a clean way to group parameters and forward logic together.
+By Day 04, the tensor engine can do the math needed for a dense layer:
 
-That is what a `Module` does.
+- matrix multiplication
+- bias broadcasting
+- gradient propagation through both
 
-## Step 1: Define A Base Module
+The next problem is organization. A model should not be a loose pile of tensors.
+It should be an object that owns parameters and knows how to run a forward pass.
 
-Start with the interface, not the complexity.
+That is what `Module` gives us.
+
+## Step 1: Create A Parameter
+
+A `Parameter` is a `Tensor` that requires gradients by default.
+
+```python
+class Parameter(Tensor):
+    def __init__(self, data):
+        super().__init__(data, requires_grad=True)
+```
+
+This small class matters because it tells the rest of the framework, "this value
+is trainable model state."
+
+Question: why should weights require gradients, but input data usually should not?
+
+## Step 2: Define A Module Interface
+
+A `Module` needs two basic behaviors:
+
+- collect trainable parameters
+- clear their gradients
 
 ```python
 class Module:
     def parameters(self):
-        return []
+        ...
 
     def zero_grad(self):
-        for p in self.parameters():
-            p.grad = 0.0 * p.grad
+        for parameter in self.parameters():
+            parameter.zero_grad()
 ```
 
-`parameters()` gives the optimizer something to work with. `zero_grad()` gives training a clean reset point.
-
-Question: why should every learned component expose its parameters the same way?
-
-## Step 2: Build A Neuron
-
-A neuron needs:
-
-- one weight per input feature
-- one bias
-- one forward computation
+The final implementation also makes modules callable:
 
 ```python
-class Neuron(Module):
-    def __init__(self, nin):
-        self.w = [Tensor(random.uniform(-1, 1)) for _ in range(nin)]
-        self.b = Tensor(0.0)
+def __call__(self, *args, **kwargs):
+    return self.forward(*args, **kwargs)
 ```
 
-This is the first time parameters become persistent model state instead of temporary tensors.
+That lets a model feel like a function while still holding state.
 
-## Step 3: Write The Forward Pass
+## Step 3: Collect Parameters Recursively
 
-The neuron output is a weighted sum plus bias.
+Real models contain other modules. A sequential model contains layers. A layer
+contains weights and maybe a bias.
+
+That means `parameters()` should search through:
+
+- direct `Parameter` attributes
+- child `Module` attributes
+- lists or tuples containing parameters or modules
+
+Question: why is recursive parameter collection useful once models get deeper?
+
+## Step 4: Build A Linear Layer
+
+A linear layer computes:
 
 ```python
-def __call__(self, x):
-    act = sum((wi * xi for wi, xi in zip(self.w, x)), self.b)
-    out = act.relu()
+out = x @ weight + bias
+```
+
+The layer owns:
+
+- `weight` with shape `(in_features, out_features)`
+- optional `bias` with shape `(out_features,)`
+
+```python
+class Linear(Module):
+    def __init__(self, in_features, out_features, bias=True):
+        scale = np.sqrt(2.0 / in_features)
+        self.weight = Parameter(np.random.randn(in_features, out_features) * scale)
+        self.bias = Parameter(np.zeros(out_features)) if bias else None
+```
+
+This is the vectorized version of many neurons at once. Instead of creating one
+neuron object per output, matrix multiplication computes all outputs together.
+
+## Step 5: Write The Forward Pass
+
+```python
+def forward(self, x):
+    out = x @ self.weight
+    if self.bias is not None:
+        out = out + self.bias
     return out
 ```
 
-This keeps the neuron readable:
+The hard work here depends on earlier lessons:
 
-- multiply each input by its weight
-- add them up
-- add bias
-- apply nonlinearity
+- Day 04 matmul sends gradients into both `x` and `weight`
+- Day 04 broadcasting sends the batch bias gradient back into `bias`
 
-Question: why is the bias included as the starting value to `sum(...)`?
+Question: if `x` has shape `(32, 4)` and `weight` has shape `(4, 3)`, what shape
+does the output have?
 
-## Step 4: Expose Parameters
-
-```python
-def parameters(self):
-    return self.w + [self.b]
-```
-
-This is what allows optimizers and training loops to treat the neuron generically.
-
-## Step 5: Test One Neuron
+## Step 6: Test One Layer
 
 ```python
-n = Neuron(3)
-x = [Tensor(2.0), Tensor(3.0), Tensor(-1.0)]
-y = n(x)
+x = Tensor([[1.0, 2.0, 3.0]])
+layer = Linear(3, 2)
+y = layer(x)
 ```
 
 Now inspect:
 
 ```python
-print(y)
-print(n.parameters())
+print(y.shape)
+print(len(layer.parameters()))
 ```
 
-Questions:
+Expected ideas:
 
-- how many parameters should a 3-input neuron have?
-- why are weights and bias both parameters?
+- `y.shape` should be `(1, 2)`
+- the layer should expose the weight and bias as parameters
+
+## Where This Lives In Code
+
+The final project implementation for this lesson lives in `vuktorch/nn.py`.
+
+Look for:
+
+- `Parameter` for trainable tensors
+- `Module.parameters` for recursive parameter discovery
+- `Module.zero_grad` for clearing parameter gradients
+- `Module.__call__` for forwarding calls into `forward`
+- `Linear` for the first reusable neural-network layer
+
+The matching behavior is used in `tests/test_nn.py`, where a small linear model
+learns a simple relationship. That is the portfolio proof that the module system
+connects correctly to autograd and optimization.
 
 ## Homework
 
-### Homework 1: Add A Linear Neuron Option
+### Homework 1: Inspect Parameter Shapes
 
-Allow the neuron to skip ReLU.
+Create a `Linear(4, 3)` layer and print each parameter shape.
 
-One clean interface:
+Expected shapes:
 
-```python
-Neuron(nin, nonlin=True)
+- weight: `(4, 3)`
+- bias: `(3,)`
+
+### Homework 2: Add A Readable `__repr__`
+
+Make `Linear(4, 3)` print something compact, such as:
+
+```text
+Linear(in_features=4, out_features=3, bias=True)
 ```
 
-This is good homework because it introduces small configurability without changing the whole class design.
+This is useful portfolio polish because readable models are easier to debug and
+easier to explain.
 
-### Homework 2: Add `__repr__`
+### Stretch: Add A Bias-Free Layer
 
-Make a neuron print something readable, such as how many inputs it has and whether it uses a nonlinearity.
-
-### Stretch: Nested Modules
-
-Think ahead: if a layer contains many neurons, how should `parameters()` combine them?
+Test `Linear(4, 3, bias=False)` and confirm that it exposes only one parameter.
 
 ## End Of Day 05
 
-Day 05 is complete once a learned component feels like both a function and a container of trainable state.
+Day 05 is complete once learned layers feel like reusable objects instead of
+manual tensor expressions.
 
 Continue with the community here: [Become AI Researcher](https://skool.com/become-ai-researcher-2669/about).

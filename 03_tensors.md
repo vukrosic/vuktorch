@@ -155,6 +155,21 @@ Expected gradients:
 
 Question: why does the `sum()` make `z` a scalar-like output again?
 
+## Where This Lives In Code
+
+The final project implementation for this lesson lives in `vuktorch/tensor.py`.
+
+Look for:
+
+- `Tensor.__init__` for `data`, `requires_grad`, `grad`, `_prev`, `_op`, and `_backward`
+- `Tensor.__add__`, `Tensor.__mul__`, and `Tensor.__pow__` for local backward rules
+- `Tensor.sum` and `Tensor.mean` for reductions
+- `Tensor.backward` for the topological traversal from Day 02, now generalized to arrays
+
+The matching tests live in `tests/test_tensor.py`, especially the scalar backward
+and shape-gradient tests. Those tests are portfolio proof that the engine is not
+just a lesson sketch.
+
 ## Homework
 
 ### Homework 1: Add `mean()`

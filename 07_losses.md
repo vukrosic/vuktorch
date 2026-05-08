@@ -87,6 +87,20 @@ Classification-style question:
 
 - if the correct class gets low probability, should the loss be small or large?
 
+## Where This Lives In Code
+
+The final project implementation for this lesson lives in `vuktorch/losses.py`.
+
+Look for:
+
+- `mse_loss` for the regression loss built from existing tensor operations
+- `cross_entropy` for stable classification loss on a batch of logits
+- the manual cross-entropy backward rule, which writes the softmax-gradient result back into `logits`
+
+The matching tests live in `tests/test_nn.py`. They check that MSE can support a
+learned regression model and that cross-entropy produces gradients with the same
+shape as the logits.
+
 ## Homework
 
 ### Homework 1: Write `mse(pred, target)`

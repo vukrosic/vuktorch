@@ -114,6 +114,22 @@ Questions:
 
 If the shapes are wrong, the gradients are wrong, even if the code runs.
 
+## Where This Lives In Code
+
+The final project implementation for this lesson lives in `vuktorch/tensor.py`.
+
+Look for:
+
+- `_unbroadcast` for reducing broadcasted gradients back to the original input shape
+- `Tensor.__add__` and `Tensor.__mul__` for broadcasting-aware elementwise gradients
+- `Tensor.__matmul__` for matrix multiplication and its backward rule
+- `Tensor.relu`, `Tensor.tanh`, `Tensor.exp`, and `Tensor.log` for useful neural-network operations
+- `Tensor.reshape` and `Tensor.transpose` for shape manipulation
+
+The matching tests live in `tests/test_tensor.py`. The broadcast and matmul tests
+are especially important because they prove the framework handles the shape logic
+that real models depend on.
+
 ## Homework
 
 ### Homework 1: Add Bias Broadcasting

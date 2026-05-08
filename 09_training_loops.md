@@ -90,6 +90,22 @@ A classic small target is XOR or another synthetic dataset where:
 
 That makes debugging much easier than jumping straight to a larger dataset.
 
+## Where This Lives In Code
+
+The final project training loop lives in `examples/mlp_moons.py`.
+
+Look for:
+
+- `make_moons` for a tiny synthetic classification dataset
+- `model = MLP(2, [8, 8], 2)` for a compact classifier
+- `cross_entropy(logits, y)` for the training objective
+- `optim.zero_grad()`, `loss.backward()`, and `optim.step()` for the repeated training step
+- the printed loss and accuracy, which make the example useful as a portfolio demo
+
+The same training idea is also tested in `tests/test_nn.py`, where a model must
+learn a simple line. The test is smaller than the demo, but it proves the loop is
+not just cosmetic.
+
 ## Homework
 
 ### Homework 1: Train On XOR
